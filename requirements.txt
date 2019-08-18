@@ -1,0 +1,12 @@
+Django==2.2.4
+django-redis==4.10.0
+neo4j-driver==1.6.3
+neomodel==3.3.1
+neotime==1.7.4
+pandas==0.25.0
+PyJWT==1.7.1
+python-dateutil==2.8.0
+pytz==2019.2
+redis==3.3.6
+six==1.12.0
+sqlparse==0.3.0
