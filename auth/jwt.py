@@ -7,16 +7,8 @@ SECRET_KEY = settings.SECRET_KEY
 
 
 def create_auth_token(user_uuid):
-    # Auth User
-    try:
-        User.nodes.get(uuid=user_uuid)
-        encoded = jwt.encode({'uuid': user_uuid, 'exp': datetime.utcnow() + timedelta(days=30)}, settings.SECRET_KEY, algorithm='HS256', )
-        return encoded
-
-    except User.DoesNotExist:
-        return None
-    except Exception as e:
-        return None
+    encoded = jwt.encode({'uuid': user_uuid, 'exp': datetime.utcnow() + timedelta(days=30)}, settings.SECRET_KEY, algorithm='HS256', )
+    return encoded
 
 
 def verify_auth_token(token):

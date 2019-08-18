@@ -29,7 +29,7 @@ class LoginView(generics.CreateAPIView):
                 'success': True,
                 'message': 'Successfully Logged in',
                 'data': {
-                    'uuid': request_data.get('uuid'),
+                    'uuid': user.uuid,
                     'token': token
                 }
             }
