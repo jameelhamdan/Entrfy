@@ -5,6 +5,7 @@ from auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from auth.jwt import create_auth_token
+from rest_framework.permissions import IsAuthenticated
 
 
 class LoginView(generics.CreateAPIView):
@@ -63,7 +64,17 @@ class RegisterView(generics.CreateAPIView):
         return Response(result_data, status=status.HTTP_201_CREATED)
 
 
+class HelloView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = request.user
+        content = {'message': 'Hello, {}!'.format(request.user.user_name)}
+        return Response(content)
+
+
 urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('register', RegisterView.as_view(), name='register'),
+    path('auth_test', HelloView.as_view(), name='auth_test'),
 ]

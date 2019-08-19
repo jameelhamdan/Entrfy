@@ -11,6 +11,19 @@ def create_auth_token(user_uuid):
     return encoded
 
 
+def token_is_valid(token):
+    try:
+        # Decode Token
+        jwt.decode(token, settings.SECRET_KEY, verify=True, algorithms=['HS256'])
+        return token
+
+    except jwt.ExpiredSignatureError:
+        return Exception('This Token is expired!')
+
+    except Exception as e:
+        return Exception(str(e))
+
+
 def verify_auth_token(token):
     try:
         # Decode Token
@@ -19,17 +32,16 @@ def verify_auth_token(token):
 
         # Auth User
         try:
-            User.nodes.get(uuid=user_uuid)
-            data = data
-            return True
+            user = User.nodes.get(uuid=user_uuid)
+            return user
 
         except User.DoesNotExist:
-            return False
+            raise Exception('This User Doesn\'t Exist!')
         except Exception as e:
-            return False
+            raise e
 
     except jwt.ExpiredSignatureError:
-        return False
+        return Exception('This Token is expired!')
 
     except Exception as e:
-        return False
+        return Exception(str(e))

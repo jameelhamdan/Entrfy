@@ -9,6 +9,10 @@ class User(BaseNode):
     password_hash = StringProperty()
     last_login = DateTimeProperty(default_now=True)
 
+    @property
+    def is_authenticated(self):
+        return True
+
     def set_password(self, new_password):
         self.password_hash = hash_password(new_password)
         self.save()

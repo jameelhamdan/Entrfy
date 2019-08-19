@@ -4,12 +4,12 @@ import neomodel.config as neo4j
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'a9h)a4c!vqi)z!4ne5ni@iicf!j_iz4xua6e!$o33cqm#s+z*7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+NEOMODEL_CYPHER_DEBUG = 1
 
 ALLOWED_HOSTS = []
 
@@ -49,7 +49,9 @@ WSGI_APPLICATION = 'settings.wsgi.application'
 neo4j.DATABASE_URL = 'bolt://neo4j:1234@localhost:7687'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'auth.middleware.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [],
     'UNAUTHENTICATED_USER': None,
 }
@@ -75,9 +77,9 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        'neo4j': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': 'DEBUG',
         },
     },
 }
