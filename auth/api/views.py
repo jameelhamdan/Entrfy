@@ -4,7 +4,7 @@ from auth.api.serializers import LoginSerializer, RegisterSerializer
 from auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
-from auth.jwt import create_auth_token
+from auth.backend.jwt import create_auth_token
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -22,20 +22,20 @@ class LoginView(generics.CreateAPIView):
         result_data = {
             'success': False,
             'message': 'Log in Error',
-            'data': None
+            'result': None
         }
 
         if token:
             result_data = {
                 'success': True,
                 'message': 'Successfully Logged in',
-                'data': {
+                'result': {
                     'uuid': user.uuid,
                     'token': token
                 }
             }
 
-        return Response(result_data, status=status.HTTP_201_CREATED)
+        return Response(result_data, status=status.HTTP_200_OK)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -55,6 +55,7 @@ class RegisterView(generics.CreateAPIView):
 
         result_data = {
             'success': True,
+            'code': status.HTTP_500_INTERNAL_SERVER_ERROR,
             'message': 'Successfully Registered User',
             'data': {
                 'uuid': user.uuid

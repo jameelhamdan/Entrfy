@@ -1,7 +1,7 @@
-from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken, TokenError
-from rest_framework_simplejwt.settings import api_settings
+from auth.backend.exceptions import AuthenticationFailed, InvalidToken
+from auth.backend.settings import api_settings
+from auth.backend.jwt import verify_auth_token, token_is_valid
 from rest_framework import HTTP_HEADER_ENCODING
-from auth.jwt import verify_auth_token, token_is_valid
 
 
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
@@ -15,7 +15,7 @@ AUTH_HEADER_TYPE_BYTES = set(
 )
 
 
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiOGY2YzYzMGI5NDY1NDc2ZDg2YjE1YmExOGM0YzM3OTkiLCJleHAiOjE1Njg3ODY0NjV9.vR1J_LfygoeziZ9axDvRGRkes12-l35t45BJXtuFf-U
+# Rest Framework authentication
 class JWTAuthentication:
     www_authenticate_realm = 'api'
 
@@ -27,10 +27,10 @@ class JWTAuthentication:
         raw_token = self.get_raw_token(header)
         if raw_token is None:
             return None
+
         validated_token = self.get_validated_token(raw_token)
+
         result = self.get_user(validated_token)
-        if type(result) is Exception:
-            raise AuthenticationFailed(result)
 
         return result, None
 
@@ -71,17 +71,11 @@ class JWTAuthentication:
     def get_validated_token(self, raw_token):
         try:
             return token_is_valid(raw_token)
-
         except Exception as e:
-            raise InvalidToken({
-                'detail': 'Invalid Token',
-                'message': str(e)
-            })
+            raise InvalidToken()
 
     def get_user(self, raw_token):
         try:
             return verify_auth_token(raw_token)
         except Exception as e:
-            raise InvalidToken({
-                'detail': 'Token Invalid: {}'.format(e),
-            })
+            raise AuthenticationFailed()
