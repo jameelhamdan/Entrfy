@@ -16,7 +16,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # 'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'auth',
     'main',
 ]
@@ -49,9 +49,7 @@ WSGI_APPLICATION = 'settings.wsgi.application'
 neo4j.DATABASE_URL = 'bolt://neo4j:1234@localhost:7687'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'auth.middleware.JWTAuthentication',
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
     'UNAUTHENTICATED_USER': None,
 }
