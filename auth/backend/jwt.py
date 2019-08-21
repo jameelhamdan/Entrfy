@@ -18,7 +18,7 @@ def token_is_valid(token):
         return token
 
     except jwt.ExpiredSignatureError:
-        raise Exception('This Token is expired!')
+        raise Exception('Token expired')
 
     except Exception as e:
         raise Exception(str(e))

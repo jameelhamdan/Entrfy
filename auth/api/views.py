@@ -12,10 +12,10 @@ class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
 
     def create(self, request, *args, **kwargs):
-        request_data = self.request.data
+        request_data = request.data
 
-        serializer = self.get_serializer(data=request.data)
-        user = serializer.validate(self.request.data)
+        serializer = self.get_serializer(data=request_data)
+        user = serializer.validate(request_data)
 
         token = create_auth_token(user.uuid)
 
@@ -62,9 +62,10 @@ class RegisterView(generics.CreateAPIView):
             }
         }
 
-        return Response(result_data, status=status.HTTP_201_CREATED)
+        return Response(result_data, status=status.HTTP_200_OK)
 
 
+@auth_view()
 class HelloView(views.APIView):
     def get(self, request, *args, **kwargs):
         user = self.request.current_user
@@ -75,5 +76,5 @@ class HelloView(views.APIView):
 urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('register', RegisterView.as_view(), name='register'),
-    path('auth_test', auth_view(HelloView.as_view()), name='auth_test'),
+    path('auth_test', HelloView.as_view(), name='auth_test'),
 ]

@@ -52,6 +52,9 @@ neo4j.DATABASE_URL = 'bolt://neo4j:1234@localhost:7687'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
+    # 'DEFAULT_PARSER_CLASSES': [
+    #     'rest_framework.parsers.JSONParser',
+    # ],
     'UNAUTHENTICATED_USER': None,
 }
 
