@@ -33,6 +33,7 @@ def verify_auth_token(token):
         # Auth User
         try:
             user = User.nodes.get(uuid=user_uuid)
+            # user.is_authenticated = True
             return user
 
         except User.DoesNotExist:

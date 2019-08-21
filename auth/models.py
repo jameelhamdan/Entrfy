@@ -1,6 +1,7 @@
 from neomodel import (config, StructuredNode, StringProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, DateTimeProperty)
 from extensions.models import BaseNode
 from extensions.helpers import hash_password, verify_password
+from functools import partial
 
 
 class User(BaseNode):
@@ -9,9 +10,13 @@ class User(BaseNode):
     password_hash = StringProperty()
     last_login = DateTimeProperty(default_now=True)
 
-    @property
-    def is_authenticated(self):
-        return True
+    # @property
+    # def is_authenticated(self):
+    #     return self.is_authenticated
+    #
+    # @is_authenticated.setter
+    # def is_authenticated(self, value):
+    #     self.is_authenticated = value
 
     def set_password(self, new_password):
         self.password_hash = hash_password(new_password)

@@ -66,11 +66,10 @@ class RegisterView(generics.CreateAPIView):
 
 
 class HelloView(views.APIView):
-
-    def get(self, request):
-        user = request.user
-        content = {'message': 'Hello, {}!'.format(request.user.user_name)}
-        return Response(content)
+    def get(self, request, *args, **kwargs):
+        user = self.request.current_user
+        content = {'message': 'Hello, {}!'.format(user.user_name)}
+        return Response(content, status=status.HTTP_200_OK)
 
 
 urlpatterns = [

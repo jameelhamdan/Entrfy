@@ -1,12 +1,13 @@
-from auth.backend.exceptions import AuthenticationFailed, InvalidToken
+from auth.backend.exceptions import AuthenticationFailed
 from auth.backend.settings import api_settings
 from auth.backend.jwt import verify_auth_token, token_is_valid
 from rest_framework import HTTP_HEADER_ENCODING
 from django.conf import settings
 from django.http import HttpResponse
-
-
+from re import sub
 from functools import wraps
+from django.middleware.common import MiddlewareMixin
+
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
 
 if not isinstance(api_settings.AUTH_HEADER_TYPES, (list, tuple)):
@@ -19,28 +20,39 @@ AUTH_HEADER_TYPE_BYTES = set(
 www_authenticate_realm = 'api'
 
 
-# Rest Framework authentication
-class JWTAuthentication(object):
+class AuthMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
 
+    @staticmethod
+    def process_view(request, view_func, *view_args, **view_kwargs):
+        try:
+            if view_func.authenticate_request:
+                header_token = request.META.get('HTTP_AUTHORIZATION', None)
+                if header_token is not None:
+                    user = _http_auth_helper(request)
+                    setattr(request, 'current_user', user)
+                    return view_func(request, *view_args, **view_kwargs)
 
-    def process_request(self, request):
-        return _http_auth_helper(request)
+        except Exception as e:
+            return view_func(request, *view_args, **view_kwargs)
 
-    # def authenticate_header(self, request):
-    #     return
+    def __call__(self, request):
+        response = self.get_response(request)
+        return response
 
 
 def _http_auth_helper(request):
     # handle auth and set request.user attribute and return None
     try:
         # get header
-        header = request.META.get('HTTP_AUTHORIZATION')
-        header = '{0} realm="{1}"'.format(AUTH_HEADER_TYPES[0], www_authenticate_realm,)
+        header = request.META.get('HTTP_AUTHORIZATION', None)
 
         # get token
         parts = header.split()
 
-        if len(parts) == 0 or len(parts) != 2 or parts[0] not in AUTH_HEADER_TYPE_BYTES:
+        if len(parts) == 0 or len(parts) != 2 or parts[0].encode(
+                HTTP_HEADER_ENCODING) not in AUTH_HEADER_TYPE_BYTES:
             raise AuthenticationFailed(
                 'Authorization header must contain two space-delimited values',
                 code='bad_authorization_header',
@@ -48,15 +60,12 @@ def _http_auth_helper(request):
 
         validated_token = token_is_valid(parts[1])
         user = verify_auth_token(validated_token)
-        request.user = user
-        return None
+        return user
 
     except Exception as e:
-        # handle error and return Response
         resp = HttpResponse()
         resp.status_code = 401
         try:
-            # If we have a realm in our settings, use this for the challenge.
             realm = settings.HTTP_AUTH_REALM
         except AttributeError:
             realm = ""
@@ -65,16 +74,7 @@ def _http_auth_helper(request):
         return resp
 
 
-def auth_view(func):
-
-    @wraps(func)
-    def inner(request, *args, **kwargs):
-        result = _http_auth_helper(request)
-        if result is not None:
-            return result
-        return func(request, *args, **kwargs)
-
-    return inner
-
-
-
+def auth_view(function):
+    orig_func = function
+    setattr(orig_func, 'authenticate_request', True)
+    return function
