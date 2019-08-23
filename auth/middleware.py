@@ -1,10 +1,9 @@
 from auth.backend.settings import api_settings
 from auth.backend.jwt import verify_auth_token, token_is_valid
 from rest_framework import HTTP_HEADER_ENCODING, status
-from django.http import JsonResponse
 from functools import wraps
-from django.utils.decorators import  method_decorator
-from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from extensions.helpers import get_raw_response
 
 
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
@@ -29,18 +28,10 @@ class AuthMiddleware(object):
             if getattr(view_func, 'authenticate_request', None):
                 user = _http_auth_helper(request)
                 setattr(request, 'current_user', user)
-
             return view_func(request, *view_args, **view_kwargs)
 
         except Exception as e:
-
-            result_data = {
-                'success': False,
-                'message': 'Internal Server Error',
-                'result': str(e)
-            }
-
-            return JsonResponse(result_data, status=status.HTTP_401_UNAUTHORIZED)
+            return get_raw_response(success=False, message='Authentication Failed', detail_code='authentication_failed', status_code=status.HTTP_401_UNAUTHORIZED)
 
     def __call__(self, request):
         response = self.get_response(request)

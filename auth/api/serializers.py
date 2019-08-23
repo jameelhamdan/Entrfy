@@ -9,6 +9,8 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
     def validate(self, data):
+        self.is_valid(raise_exception=True)
+
         user_name = data.get('user_name', None)
         email = data.get('email', None)
 
@@ -39,6 +41,7 @@ class RegisterSerializer(serializers.Serializer):
     password_confirm = serializers.CharField(required=True)
 
     def validate(self, data):
+        self.is_valid(raise_exception=True)
         # Validate Password
 
         if not data['password'] == data['password_confirm']:

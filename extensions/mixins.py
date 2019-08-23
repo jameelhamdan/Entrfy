@@ -9,11 +9,12 @@ class APIViewMixin(views.APIView):
 
         response.data = {
             'success': False,
+            'code': exc.default_code,
             'message': response.reason_phrase,
             'result': response.data
         }
 
         return response
 
-    def get_response(self, success=True, message='Success', result=None, status_code=status.HTTP_200_OK):
-        return get_response(success=success, message=message, result=result, status_code=status_code)
+    def get_response(self, success=True, message='Success', result=None, detail_code='success', status_code=status.HTTP_200_OK):
+        return get_response(success=success, message=message, result=result, detail_code=detail_code, status_code=status_code)

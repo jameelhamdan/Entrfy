@@ -7,6 +7,8 @@ class AddInterestSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
 
     def validate(self, data):
+        self.is_valid(raise_exception=True)
+
         name = data.get('name', None)
         interest = Interest(name=name)
         interest.save()
@@ -18,22 +20,20 @@ class AddUserInterestSerializer(serializers.Serializer):
     interest_uuid = serializers.CharField(required=True)
 
     def validate(self, data):
-        try:
-            interest_uuid = data.get('interest_uuid', None)
+        self.is_valid(raise_exception=True)
 
-            current_user = data.request.current_user
+        interest_uuid = data.get('interest_uuid', None)
 
-            interest = Interest.nodes.get_or_none(uuid=interest_uuid)
-            # check if already interested in it
-            result = interest.users.relationship(current_user)
-            if result:
-                raise Exception('You\'re already interested in this topic')
+        current_user = data.request.current_user
 
-            interest.users.connect(current_user)
-            interest.save()
+        interest = Interest.nodes.get_or_none(uuid=interest_uuid)
+        # check if already interested in it
+        result = interest.users.relationship(current_user)
+        if result:
+            raise Exception('You\'re already interested in this topic')
 
-        except Exception as e:
-            raise serializers.ValidationError('Internal Server Error ' + str(e))
+        interest.users.connect(current_user)
+        interest.save()
 
         return interest
 
