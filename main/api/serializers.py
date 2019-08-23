@@ -15,7 +15,7 @@ class AddInterestSerializer(serializers.Serializer):
         return interest
 
 
-class AddInterestToUserSerializer(serializers.Serializer):
+class AddUserInterestSerializer(serializers.Serializer):
     interest_uuid = serializers.CharField(required=True)
 
     def validate(self, data):
@@ -26,17 +26,19 @@ class AddInterestToUserSerializer(serializers.Serializer):
 
             interest = Interest.nodes.get_or_none(uuid=interest_uuid)
             # check if already interested in it
-
-            query = "MATCH(p: User)-[r:INTERESTED_IN]->(c:Interest) WHERE(p.uuid = '{}') AND(c.uuid = '{}') RETURN count(r)".format(current_user.uuid, interest_uuid)
-
-            results, meta = db.cypher_query(query)
-            if results[0][0] > 0:
+            result = interest.users.relationship(current_user)
+            if result:
                 raise Exception('You\'re already interested in this topic')
 
-            interest.interested_users.connect(current_user)
+            interest.users.connect(current_user)
             interest.save()
 
         except Exception as e:
             raise serializers.ValidationError('Internal Server Error ' + str(e))
 
         return interest
+
+
+class ListInterestSerializer(serializers.Serializer):
+    uuid = serializers.CharField()
+    name = serializers.CharField()

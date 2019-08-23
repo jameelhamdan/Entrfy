@@ -3,7 +3,6 @@ import hashlib
 import binascii
 import os
 
-
 def generate_uuid():
     return lambda: uuid.uuid4().hex
 
@@ -25,3 +24,7 @@ def verify_password(stored_password, provided_password):
                                   100000)
     pwdhash = binascii.hexlify(pwdhash).decode('ascii')
     return pwdhash == stored_password
+
+
+def serializer_to_json(serializer_class, list_object):
+    return serializer_class(list_object, many=True).data

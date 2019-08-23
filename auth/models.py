@@ -7,6 +7,14 @@ class UserFollowerRelationship(BaseReltionship):
     pass
 
 
+class UserInterestRelationship(BaseReltionship):
+    pass
+
+
+class UserPostRelationship(BaseReltionship):
+    pass
+
+
 class UserMixin(object):
     def set_password(self, new_password):
         self.password_hash = hash_password(new_password)
@@ -32,4 +40,5 @@ class User(BaseNode, UserMixin):
     password_hash = StringProperty()
     last_login = DateTimeProperty(default_now=True)
 
-    followers = RelationshipTo('User', 'FOLLOWING', model=UserFollowerRelationship, cardinality=ZeroOrOne)
+    followers = Relationship('User', 'FOLLOWING', model=UserFollowerRelationship, cardinality=ZeroOrOne)
+    interests = Relationship('main.models.Interest', "INTERESTED_IN", model=UserInterestRelationship, cardinality=ZeroOrMore)
