@@ -1,14 +1,14 @@
-from rest_framework import views, generics
+from rest_framework import views, generics, status, response
 from django.urls import path
 from auth.api.serializers import LoginSerializer, RegisterSerializer
-from rest_framework import status
-from rest_framework.response import Response
 from auth.backend.jwt import create_auth_token
 from auth.middleware import view_allow_any, view_authenticate
+from extensions.helpers import serializer_to_json
+from extensions.mixins import APIViewMixin
 
 
 @view_allow_any()
-class LoginView(generics.CreateAPIView):
+class LoginView(APIViewMixin, generics.CreateAPIView):
     serializer_class = LoginSerializer
 
     def create(self, request, *args, **kwargs):
@@ -18,51 +18,35 @@ class LoginView(generics.CreateAPIView):
 
         token = create_auth_token(user.uuid)
 
-        result_data = {
-            'success': False,
-            'message': 'Log in Error',
-            'result': None
-        }
-
-        if token:
-            result_data = {
-                'success': True,
-                'message': 'Successfully Logged in',
-                'result': {
-                    'uuid': user.uuid,
-                    'token': token
-                }
+        if not token:
+            raise Exception('Login Failed')
+        else:
+            result = {
+                'uuid': user.uuid,
+                'token': token
             }
-
-        return Response(result_data, status=status.HTTP_200_OK)
+            return self.get_response(message='Successfully Logged in', result=result)
 
 
 @view_allow_any()
-class RegisterView(generics.CreateAPIView):
+class RegisterView(APIViewMixin, generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         user = serializer.validate(request.data)
 
-        result_data = {
-            'success': True,
-            'code': status.HTTP_500_INTERNAL_SERVER_ERROR,
-            'message': 'Successfully Registered User',
-            'data': {
-                'uuid': user.uuid
-            }
+        result = {
+            'uuid': user.uuid,
         }
-
-        return Response(result_data, status=status.HTTP_200_OK)
+        return self.get_response(message='Successfully Registered User', result=result)
 
 
 @view_authenticate()
-class HelloView(views.APIView):
+class HelloView(APIViewMixin, views.APIView):
     def get(self, request, *args, **kwargs):
         user = self.request.current_user
-        content = {'message': 'Hello, {}!'.format(user.user_name)}
-        return Response(content, status=status.HTTP_200_OK)
+        return self.get_response(message='Hello, {}!'.format(user.user_name))
 
 
 urlpatterns = [

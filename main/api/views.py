@@ -1,33 +1,28 @@
-from rest_framework import views, generics
+from rest_framework import views, generics, status, response
 from django.urls import path
 from main.api.serializers import AddInterestSerializer, AddUserInterestSerializer, ListInterestSerializer
-from rest_framework import status
-from rest_framework.response import Response
 from auth.middleware import view_allow_any, view_authenticate
 from extensions.helpers import serializer_to_json
+from extensions.mixins import APIViewMixin
 
 
 @view_authenticate()
-class AddNewInterestView(generics.CreateAPIView):
+class AddNewInterestView(APIViewMixin, generics.CreateAPIView):
     serializer_class = AddInterestSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         interest = serializer.validate(request.data)
 
-        result_data = {
-            'success': True,
-            'message': 'Successfully Added Interest',
-            'result': {
-                'interest': interest.name,
-            }
+        result = {
+            'interest': interest.name,
         }
 
-        return Response(result_data, status=status.HTTP_200_OK)
+        return self.get_response(message='Successfully Added Interest', result=result)
 
 
 @view_authenticate()
-class AddInterestView(generics.CreateAPIView):
+class AddInterestView(APIViewMixin, generics.CreateAPIView):
     serializer_class = AddUserInterestSerializer
 
     def create(self, request, *args, **kwargs):
@@ -35,27 +30,17 @@ class AddInterestView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.validate(request.data)
 
-        result_data = {
-            'success': True,
-            'message': 'Successfully Added Interest To Me',
-            'result': {}
-        }
-
-        return Response(result_data, status=status.HTTP_200_OK)
+        return self.get_response(message='Successfully Added Interest')
 
 
 @view_authenticate()
-class ListUserInterests(generics.ListAPIView):
+class ListUserInterests(APIViewMixin, generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         user = self.request.current_user
         interests_list = serializer_to_json(ListInterestSerializer, user.interests.all())
-        result_data = {
-            'success': True,
-            'message': 'Successfully Retrieved Interests for user {}'.format(user.user_name),
-            'result': interests_list
-        }
+        message = 'Successfully Retrieved Interests for user {}'.format(user.user_name)
 
-        return Response(result_data, status=status.HTTP_200_OK)
+        return self.get_response(message=message, result=interests_list)
 
 
 urlpatterns = [

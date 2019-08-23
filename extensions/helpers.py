@@ -1,3 +1,4 @@
+from rest_framework import response, status
 import uuid
 import hashlib
 import binascii
@@ -28,3 +29,12 @@ def verify_password(stored_password, provided_password):
 
 def serializer_to_json(serializer_class, list_object):
     return serializer_class(list_object, many=True).data
+
+
+def get_response(success=True, message='Success', result=None, status_code=status.HTTP_200_OK):
+    result = {
+        'success': success,
+        'message': message,
+        'result': result
+    }
+    return response.Response(result, status=status_code)

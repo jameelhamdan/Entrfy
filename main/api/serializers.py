@@ -2,8 +2,7 @@ from rest_framework import serializers
 from main.models import Interest, Post
 from neomodel import db
 
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiOGY2YzYzMGI5NDY1NDc2ZDg2YjE1YmExOGM0YzM3OTkiLCJleHAiOjE1NjkxNDQwMTJ9.9SwFCc-Z_kDBdZFGThR-8Nye3aY0skV5P2gnodbU9Qc
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiNWQ0YjZiMDhjMmMzNDU3NGE4MzQxZjg3MzBkODU5YWYiLCJleHAiOjE1NjkxNDYxNDF9.k3VfNkiKYrJQ_0MTzbBathe45qBT1AErDBGtwLQ7ARQ
+
 class AddInterestSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
 
