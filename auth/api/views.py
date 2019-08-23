@@ -14,7 +14,8 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
 
         serializer = self.get_serializer(data=request.data)
-        user = serializer.validate(request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
 
         token = create_auth_token(user.uuid)
 
@@ -34,7 +35,8 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        user = serializer.validate(request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
 
         result = {
             'uuid': user.uuid,
@@ -45,7 +47,7 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
 @view_authenticate()
 class HelloView(APIViewMixin, views.APIView):
     def get(self, request, *args, **kwargs):
-        user = self.request.current_user
+        user = self.request.currenttt_user
         return self.get_response(message='Hello, {}!'.format(user.user_name))
 
 

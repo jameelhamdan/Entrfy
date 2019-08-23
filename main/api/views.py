@@ -12,7 +12,8 @@ class AddNewInterestView(APIViewMixin, generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        interest = serializer.validate(request.data)
+        serializer.is_valid(raise_exception=True)
+        interest = serializer.validated_data
 
         result = {
             'interest': interest.name,
@@ -26,9 +27,8 @@ class AddInterestView(APIViewMixin, generics.CreateAPIView):
     serializer_class = AddUserInterestSerializer
 
     def create(self, request, *args, **kwargs):
-        setattr(request.data, 'request', request)
-        serializer = self.get_serializer(data=request.data)
-        serializer.validate(request.data)
+        serializer = self.get_serializer(data=request.data, context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
 
         return self.get_response(message='Successfully Added Interest')
 
