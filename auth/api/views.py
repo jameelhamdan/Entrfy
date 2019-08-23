@@ -66,7 +66,7 @@ class HelloView(views.APIView):
 
 
 urlpatterns = [
-    path('login', LoginView.as_view(), name='login'),
-    path('register', RegisterView.as_view(), name='register'),
-    path('auth_test', HelloView.as_view(), name='auth_test'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('auth_test/', HelloView.as_view(), name='auth_test'),
 ]

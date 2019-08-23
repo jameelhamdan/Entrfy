@@ -13,7 +13,7 @@ class UserPostRelationship(BaseReltionship):
 
 class Interest(BaseNode):
     name = StringProperty(unique_index=True, required=True)
-    interested_users = RelationshipFrom(User, "INTERESTED_IN", model=UserInterestRelationship, cardinality=ZeroOrMore)
+    interested_users = Relationship(User, "INTERESTED_IN", model=UserInterestRelationship, cardinality=ZeroOrMore)
 
 
 class Post(BaseNode):
