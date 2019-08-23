@@ -2,6 +2,9 @@ from auth.backend.settings import api_settings
 from auth.backend.jwt import verify_auth_token, token_is_valid
 from rest_framework import HTTP_HEADER_ENCODING, status
 from django.http import JsonResponse
+from functools import wraps
+from django.utils.decorators import  method_decorator
+from django.contrib.auth.decorators import login_required
 
 
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
@@ -26,13 +29,14 @@ class AuthMiddleware(object):
             if getattr(view_func, 'authenticate_request', None):
                 user = _http_auth_helper(request)
                 setattr(request, 'current_user', user)
-                return view_func(request, *view_args, **view_kwargs)
+
+            return view_func(request, *view_args, **view_kwargs)
 
         except Exception as e:
 
             result_data = {
                 'success': False,
-                'message': 'Authentication Error',
+                'message': 'Internal Server Error',
                 'result': str(e)
             }
 
@@ -63,11 +67,21 @@ def _http_auth_helper(request):
     return user
 
 
-def auth_view(method_name='dispatch'):
-    def inner(cls):
-        orig_func = getattr(cls, method_name)
-        setattr(orig_func, 'authenticate_request', True)
-        setattr(cls, method_name, orig_func)
-        
-        return cls
-    return inner
+def _auth_user(value=True):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapped_view(*args, **kwargs):
+            return view_func(*args, **kwargs)
+
+        wrapped_view.authenticate_request = value
+        return wraps(view_func)(wrapped_view)
+    return decorator
+
+
+def view_allow_any():
+    return method_decorator(_auth_user(value=False), name='dispatch')
+
+
+def view_authenticate():
+    return method_decorator(_auth_user(value=True), name='dispatch')
+

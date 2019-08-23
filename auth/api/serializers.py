@@ -1,13 +1,30 @@
 from rest_framework import serializers
 from auth.models import User
+from neomodel import Q
 
 
 class LoginSerializer(serializers.Serializer):
-    user_name = serializers.CharField(required=True)
+    user_name = serializers.CharField(required=False)
+    email = serializers.CharField(required=False)
     password = serializers.CharField(required=True)
 
     def validate(self, data):
-        user = User.nodes.get_or_none(user_name=data['user_name'])
+        user_name = data.get('user_name', None)
+        email = data.get('email', None)
+
+        user = None
+
+        if not user_name and not email:
+            raise serializers.ValidationError(u'You must provide an email or username')
+
+        if user_name and email:
+            raise serializers.ValidationError(u'You must only provide email or username not both')
+
+        if user_name:
+            user = User.nodes.get_or_none(user_name=user_name)
+
+        elif email:
+            user = User.nodes.get_or_none(email=email)
 
         if user is None or not user.validate_password(data['password']):
             raise serializers.ValidationError(u'Password or username is incorrect')
@@ -30,11 +47,23 @@ class RegisterSerializer(serializers.Serializer):
         # check for users with same email or user_name
         user_name = data['user_name']
         email = data['email']
+        try:
+            existing_user = User.nodes.filter(Q(Q(user_name=user_name) | Q(email=email))).first()
+        except:
+            existing_user = None
 
-        if User.nodes.first_or_none(user_name=user_name):
-            raise serializers.ValidationError(u'This User name is already registered!')
+        if existing_user:
+            if existing_user.email == email:
+                raise serializers.ValidationError(u'This Email is already registered!')
+            else:
+                raise serializers.ValidationError(u'This Username is already registered!')
+        try:
+            user = User.create_user(
+                user_name=data['user_name'],
+                email=data['email'],
+                password=data['password']
+            )
+        except Exception as e:
+            raise serializers.ValidationError(u'Internal Server Error!')
 
-        if User.nodes.first_or_none(email=email):
-            raise serializers.ValidationError(u'This email is already registered!')
-
-        return data
+        return user

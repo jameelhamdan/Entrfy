@@ -1,21 +1,20 @@
 from rest_framework import views, generics
 from django.urls import path
 from auth.api.serializers import LoginSerializer, RegisterSerializer
-from auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from auth.backend.jwt import create_auth_token
-from auth.middleware import auth_view
+from auth.middleware import view_allow_any, view_authenticate
 
 
+@view_allow_any()
 class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
 
     def create(self, request, *args, **kwargs):
-        request_data = request.data
 
-        serializer = self.get_serializer(data=request_data)
-        user = serializer.validate(request_data)
+        serializer = self.get_serializer(data=request.data)
+        user = serializer.validate(request.data)
 
         token = create_auth_token(user.uuid)
 
@@ -38,20 +37,13 @@ class LoginView(generics.CreateAPIView):
         return Response(result_data, status=status.HTTP_200_OK)
 
 
+@view_allow_any()
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
-        request_data = self.request.data
-
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        user = User.create_user(
-            user_name=request_data.get('user_name'),
-            email=request_data.get('email'),
-            password=request_data.get('password')
-        )
+        user = serializer.validate(request.data)
 
         result_data = {
             'success': True,
@@ -65,7 +57,7 @@ class RegisterView(generics.CreateAPIView):
         return Response(result_data, status=status.HTTP_200_OK)
 
 
-@auth_view()
+@view_authenticate()
 class HelloView(views.APIView):
     def get(self, request, *args, **kwargs):
         user = self.request.current_user

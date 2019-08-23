@@ -1,23 +1,13 @@
-from neomodel import (config, StructuredNode, StringProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, DateTimeProperty)
-from extensions.models import BaseNode
+from neomodel import (config, StructuredNode, StringProperty, DateTimeProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, RelationshipFrom, Relationship, ZeroOrMore, ZeroOrOne)
+from extensions.models import BaseNode, BaseReltionship
 from extensions.helpers import hash_password, verify_password
-from functools import partial
 
 
-class User(BaseNode):
-    user_name = StringProperty(unique_index=True)
-    email = StringProperty(unique_index=True)
-    password_hash = StringProperty()
-    last_login = DateTimeProperty(default_now=True)
+class UserFollowerRelationship(BaseReltionship):
+    pass
 
-    # @property
-    # def is_authenticated(self):
-    #     return self.is_authenticated
-    #
-    # @is_authenticated.setter
-    # def is_authenticated(self, value):
-    #     self.is_authenticated = value
 
+class UserMixin(object):
     def set_password(self, new_password):
         self.password_hash = hash_password(new_password)
         self.save()
@@ -34,3 +24,12 @@ class User(BaseNode):
             return new_user
         except Exception as e:
             return None
+
+
+class User(BaseNode, UserMixin):
+    user_name = StringProperty(unique_index=True)
+    email = StringProperty(unique_index=True)
+    password_hash = StringProperty()
+    last_login = DateTimeProperty(default_now=True)
+
+    followers = RelationshipTo('User', 'FOLLOWING', model=UserFollowerRelationship, cardinality=ZeroOrOne)
