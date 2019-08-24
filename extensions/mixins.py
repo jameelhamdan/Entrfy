@@ -1,4 +1,4 @@
-from rest_framework import exceptions, status, views
+from rest_framework import exceptions, status, views, response
 from extensions.helpers import get_response
 
 
@@ -19,7 +19,12 @@ class APIViewMixin(views.APIView):
         response = exception_handler(exc, context)
 
         if response is None:
-            self.raise_uncaught_exception(exc)
+            return response.Response({
+                'success': False,
+                'code': 'internal_server_error',
+                'message': u'Internal Server Error',
+                'result': None
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         response.exception = True
 

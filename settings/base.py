@@ -11,8 +11,8 @@ SECRET_KEY = 'a9h)a4c!vqi)z!4ne5ni@iicf!j_iz4xua6e!$o33cqm#s+z*7'
 DEBUG = True
 NEOMODEL_CYPHER_DEBUG = 1
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1']
+APPEND_SLASH = False
 # Application definition
 
 INSTALLED_APPS = [
@@ -22,10 +22,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'auth.middleware.AuthMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'auth.middleware.AuthMiddleware',
 ]
 
 ROOT_URLCONF = 'settings.urls'

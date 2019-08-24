@@ -47,7 +47,7 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
 @view_authenticate()
 class HelloView(APIViewMixin, views.APIView):
     def get(self, request, *args, **kwargs):
-        user = self.request.currenttt_user
+        user = self.request.current_user
         return self.get_response(message='Hello, {}!'.format(user.user_name))
 
 
