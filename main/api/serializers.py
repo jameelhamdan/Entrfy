@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from main.models import Interest, Post
+from auth.models import User
 
 
 class AddInterestSerializer(serializers.Serializer):
@@ -40,3 +41,26 @@ class AddUserInterestSerializer(serializers.Serializer):
 class ListInterestSerializer(serializers.Serializer):
     uuid = serializers.CharField()
     name = serializers.CharField()
+
+
+# Followers
+class FollowUserSerializer(serializers.Serializer):
+    user_uuid = serializers.CharField(required=True)
+
+    def validate(self, data):
+        try:
+            user_uuid = data.get('user_uuid', None)
+            current_user = self.context['request'].current_user
+
+            user = User.nodes.get_or_none(uuid=user_uuid)
+            # check if already interested in it
+
+            if current_user.follows(user_uuid):
+                raise serializers.ValidationError(u'You\'re already Following this user.')
+
+            current_user.followers.connect(user)
+            current_user.save()
+
+            return user
+        except Exception as e:
+            raise serializers.ValidationError(e.detail)

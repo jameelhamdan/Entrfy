@@ -1,6 +1,6 @@
 from rest_framework import views, generics, status, response
 from django.urls import path
-from main.api.serializers import AddInterestSerializer, AddUserInterestSerializer, ListInterestSerializer
+from main.api.serializers import *
 from auth.middleware import view_allow_any, view_authenticate
 from extensions.helpers import serializer_to_json
 from extensions.mixins import APIViewMixin
@@ -42,6 +42,18 @@ class ListUserInterests(APIViewMixin, generics.ListAPIView):
 
         return self.get_response(message=message, result=interests_list)
 
+# Followers
+@view_authenticate()
+class FollowUserView(APIViewMixin, generics.CreateAPIView):
+    serializer_class = FollowUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
+        result = serializer.validated_data
+
+        return self.get_response(message='Successfully Followed User', result={'followed': result.user_name, 'me': self.request.current_user.user_name})
+
 
 urlpatterns = [
     path('interest/add_new/', AddNewInterestView.as_view(), name='add_new_interest'),
@@ -49,4 +61,8 @@ urlpatterns = [
 
     path('interest/list/all', ListUserInterests.as_view(), name='list_all_interest'),
     path('interest/list/', ListUserInterests.as_view(), name='list_interest'),
+
+    # followers
+    path('follow/user/', FollowUserView.as_view(), name='follow_user'),
+
 ]

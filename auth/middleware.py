@@ -37,7 +37,7 @@ class AuthMiddleware(object):
             return get_raw_response(success=False, message='Authentication Failed', detail_code='authentication_failed', status_code=status.HTTP_401_UNAUTHORIZED)
 
         except Exception as e:
-            return view_func(request, *view_args, **view_kwargs)
+            raise e
 
     def __call__(self, request):
         response = self.get_response(request)

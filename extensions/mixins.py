@@ -16,9 +16,11 @@ class APIViewMixin(views.APIView):
         exception_handler = self.get_exception_handler()
 
         context = self.get_exception_handler_context()
-        response = exception_handler(exc, context)
+        exc_response = exception_handler(exc, context)
 
-        if response is None:
+        if exc_response is None:
+            self.raise_uncaught_exception(exc)
+
             return response.Response({
                 'success': False,
                 'code': 'internal_server_error',
@@ -26,16 +28,16 @@ class APIViewMixin(views.APIView):
                 'result': None
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        response.exception = True
+        exc_response.exception = True
 
-        response.data = {
+        exc_response.data = {
             'success': False,
             'code': exc.default_code,
-            'message': response.reason_phrase,
-            'result': response.data
+            'message': exc_response.reason_phrase,
+            'result': exc_response.data
         }
 
-        return response
+        return exc_response
 
     def get_response(self, success=True, message='Success', result=None, detail_code='success', status_code=status.HTTP_200_OK):
         return get_response(success=success, message=message, result=result, detail_code=detail_code, status_code=status_code)
