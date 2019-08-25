@@ -26,12 +26,11 @@ class AddUserInterestSerializer(serializers.Serializer):
 
             interest = Interest.nodes.get_or_none(uuid=interest_uuid)
             # check if already interested in it
-            result = interest.users.relationship(current_user)
-            if result:
+
+            if interest.interested_by(current_user.uuid):
                 raise serializers.ValidationError(u'You\'re already interested in this topic')
 
-            interest.users.connect(current_user)
-            interest.save()
+            interest.interest_add(current_user.uuid)
 
             return interest
         except Exception as e:
@@ -41,6 +40,11 @@ class AddUserInterestSerializer(serializers.Serializer):
 class ListInterestSerializer(serializers.Serializer):
     uuid = serializers.CharField()
     name = serializers.CharField()
+
+
+class ListUsersSerializer(serializers.Serializer):
+    uuid = serializers.CharField()
+    user_name = serializers.CharField()
 
 
 # Followers
@@ -58,7 +62,7 @@ class FollowUserSerializer(serializers.Serializer):
             if current_user.follows(user_uuid):
                 raise serializers.ValidationError(u'You\'re already Following this user.')
 
-            current_user.followers.connect(user)
+            current_user.follow(user.uuid)
             current_user.save()
 
             return user

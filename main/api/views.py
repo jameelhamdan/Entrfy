@@ -55,14 +55,25 @@ class FollowUserView(APIViewMixin, generics.CreateAPIView):
         return self.get_response(message='Successfully Followed User', result={'followed': result.user_name, 'me': self.request.current_user.user_name})
 
 
-urlpatterns = [
-    path('interest/add_new/', AddNewInterestView.as_view(), name='add_new_interest'),
-    path('interest/add/', AddInterestView.as_view(), name='add_interest'),
+@view_authenticate()
+class ListUserFollowedView(APIViewMixin, generics.ListAPIView):
+    def list(self, request, *args, **kwargs):
+        user = self.request.current_user
+        interests_list = serializer_to_json(ListUsersSerializer, user.get_followed)
+        message = 'Successfully Retrieved Followed users for {}'.format(user.user_name)
 
-    path('interest/list/all', ListUserInterests.as_view(), name='list_all_interest'),
-    path('interest/list/', ListUserInterests.as_view(), name='list_interest'),
+        return self.get_response(message=message, result=interests_list)
+
+
+urlpatterns = [
+    path('me/interest/add_new/', AddNewInterestView.as_view(), name='add_new_interest'),
+    path('me/interest/add/', AddInterestView.as_view(), name='add_interest'),
+
+    path('me/interest/list/all', ListUserInterests.as_view(), name='list_all_interest'),
+    path('me/interest/list/', ListUserInterests.as_view(), name='list_interest'),
 
     # followers
-    path('follow/user/', FollowUserView.as_view(), name='follow_user'),
+    path('me/follow/user/', FollowUserView.as_view(), name='follow_user'),
+    path('me/follow/all/', ListUserFollowedView.as_view(), name='all_people_followed'),
 
 ]
