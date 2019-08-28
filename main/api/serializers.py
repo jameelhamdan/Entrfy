@@ -30,7 +30,7 @@ class AddUserInterestSerializer(serializers.Serializer):
             if interest.interested_by(current_user.uuid):
                 raise serializers.ValidationError(u'You\'re already interested in this topic')
 
-            interest.interest_add(current_user.uuid)
+            interest.interest_add(current_user)
 
             return interest
         except Exception as e:
@@ -62,7 +62,7 @@ class FollowUserSerializer(serializers.Serializer):
             if current_user.follows(user_uuid):
                 raise serializers.ValidationError(u'You\'re already Following this user.')
 
-            current_user.follow(user.uuid)
+            current_user.follow(user)
             current_user.save()
 
             return user

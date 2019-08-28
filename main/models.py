@@ -13,11 +13,9 @@ class Interest(BaseNode):
         result = [User.inflate(row[0]) for row in results]
         return len(result) > 0
 
-    def interest_add(self, user_uuid):
-        query = "MATCH (a:User), (b:Interest) WHERE a.uuid ='{}' AND b.uuid='{}' CREATE(a)-[r:INTERESTED_IN]->(b) RETURN r".format(user_uuid, self.uuid)
-        results, meta = db.cypher_query(query)
-        result = [Interest.inflate(row[0]) for row in results]
-        return result
+    def interest_add(self, user):
+        self.users.connect(user)
+        return user
 
     @property
     def serialized(self):

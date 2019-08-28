@@ -60,12 +60,10 @@ class User(BaseNode, UserMixin):
         return len(result) > 0
 
     # follow another user
-    def follow(self, user_uuid):
-        query = "MATCH (a:User), (b:User) WHERE a.uuid ='{}' AND b.uuid='{}' CREATE(a)-[r:FOLLOWING]->(b) RETURN r".format(self.uuid, user_uuid)
-        results, meta = db.cypher_query(query)
-        result = [User.inflate(row[0]) for row in results]
+    def follow(self, user):
+        user.followers.connect(self)
 
-        return result
+        return user
 
     # get all users this users follow (maybe add pagination or something)
     @property
