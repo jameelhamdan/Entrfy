@@ -26,6 +26,12 @@ class UserMixin(object):
         return verify_password(self.password_hash, password)
 
     @staticmethod
+    def exists(user_name, email):
+        query = "MATCH (a:User) WHERE a.user_name= '{}' OR a.email='{}' RETURN count(a) > 0".format(user_name, email)
+        results, meta = db.cypher_query(query)
+        return results[0][0]
+
+    @staticmethod
     def create_user(user_name, email, password):
         try:
             new_user = User(user_name=user_name, email=email)

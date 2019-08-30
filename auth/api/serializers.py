@@ -47,16 +47,10 @@ class RegisterSerializer(serializers.Serializer):
         # check for users with same email or user_name
         user_name = data['user_name']
         email = data['email']
-        try:
-            existing_user = User.nodes.filter(Q(Q(user_name=user_name) | Q(email=email))).first()
-        except:
-            existing_user = None
 
-        if existing_user:
-            if existing_user.email == email:
-                raise serializers.ValidationError(u'This Email is already registered!')
-            else:
-                raise serializers.ValidationError(u'This Username is already registered!')
+        if User.exists(user_name, email):
+            raise serializers.ValidationError(u'This Email or Username is already registered!')
+
         try:
             user = User.create_user(
                 user_name=data['user_name'],
