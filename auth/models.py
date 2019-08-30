@@ -86,8 +86,8 @@ class User(BaseNode, UserMixin):
 
     def get_matches(self):
         query = "MATCH (p1:User {uuid:'%s'})-[:INTERESTED_IN]->(interests1) WITH p1, collect(id(interests1)) AS p1Interest " + \
-                "MATCH (p2:User)-[:INTERESTED_IN]->(interests2) WHERE p1 <> p2 WITH p1, p1Interest, p2, collect(id(interests2)) AS p2Interest " + \
-                "RETURN p2.user_name AS name, p2.uuid AS uuid, algo.similarity.jaccard(p1Interest, p2Interest) AS similarity ORDER BY similarity DESC"
+                "MATCH (p2:User)-[:INTERESTED_IN]->(interests2) WITH p1, p2, algo.similarity.jaccard(p1Interest, collect(id(interests2))) AS similarity " + \
+                "WHERE p1 <> p2 AND similarity > 0.1 RETURN p2.user_name AS name , p2.uuid AS uuid, similarity ORDER BY similarity DESC LIMIT 25;"
 
         query = query % self.uuid
         results, meta = db.cypher_query(query)
