@@ -65,7 +65,21 @@ class ListUserFollowedView(APIViewMixin, generics.ListAPIView):
         return self.get_response(message=message, result=interests_list)
 
 
+@view_authenticate()
+class ListUserMatchesView(APIViewMixin, generics.ListAPIView):
+    def list(self, request, *args, **kwargs):
+        user = self.request.current_user
+        message = 'Successfully Most Similar Matches for {}'.format(user.user_name)
+
+        return self.get_response(message=message, result=user.get_matches())
+
+
 urlpatterns = [
+    # user
+
+    path('me/matches/', ListUserMatchesView.as_view(), name='list_matches'),
+
+    # matches
     path('me/interest/add_new/', AddNewInterestView.as_view(), name='add_new_interest'),
     path('me/interest/add/', AddInterestView.as_view(), name='add_interest'),
 
@@ -75,5 +89,7 @@ urlpatterns = [
     # followers
     path('me/follow/user/', FollowUserView.as_view(), name='follow_user'),
     path('me/follow/all/', ListUserFollowedView.as_view(), name='all_people_followed'),
+
+
 
 ]

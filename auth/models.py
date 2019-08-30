@@ -1,6 +1,7 @@
 from neomodel import (config, StructuredNode, StringProperty, DateTimeProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, RelationshipFrom, Relationship, ZeroOrMore, ZeroOrOne, db)
 from extensions.models import BaseNode, BaseReltionship
 from extensions.helpers import hash_password, verify_password
+
 DEFAULT_PAGE_SIZE = 10
 
 
@@ -82,3 +83,12 @@ class User(BaseNode, UserMixin):
         people = [User.inflate(row[0]) for row in results]
 
         return people
+
+    def get_matches(self):
+        query = "MATCH (p1:User {uuid:'%s'})-[:INTERESTED_IN]->(interests1) WITH p1, collect(id(interests1)) AS p1Interest " + \
+                "MATCH (p2:User)-[:INTERESTED_IN]->(interests2) WHERE p1 <> p2 WITH p1, p1Interest, p2, collect(id(interests2)) AS p2Interest " + \
+                "RETURN p2.user_name AS name, p2.uuid AS uuid, algo.similarity.jaccard(p1Interest, p2Interest) AS similarity ORDER BY similarity DESC"
+
+        query = query % self.uuid
+        results, meta = db.cypher_query(query)
+        return results
