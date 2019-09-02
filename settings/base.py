@@ -8,7 +8,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'a9h)a4c!vqi)z!4ne5ni@iicf!j_iz4xua6e!$o33cqm#s+z*7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
 NEOMODEL_CYPHER_DEBUG = 1
 
 ALLOWED_HOSTS = ['127.0.0.1']

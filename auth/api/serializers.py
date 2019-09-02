@@ -51,13 +51,10 @@ class RegisterSerializer(serializers.Serializer):
         if User.exists(user_name, email):
             raise serializers.ValidationError(u'This Email or Username is already registered!')
 
-        try:
-            user = User.create_user(
-                user_name=data['user_name'],
-                email=data['email'],
-                password=data['password']
-            )
-        except Exception as e:
-            raise serializers.ValidationError(u'Internal Server Error!')
+        user = User.create_user(
+            user_name=data['user_name'],
+            email=data['email'],
+            password=data['password']
+        )
 
         return user
