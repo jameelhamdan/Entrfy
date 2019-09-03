@@ -2,6 +2,8 @@ from django.urls import path, include
 
 app_name = 'main'
 urlpatterns = [
-    path('', include('main.api.views'))
+    path('followers/', include('main.followers.views')),
+    path('interests/', include('main.interests.views')),
+    path('matching/', include('main.matching.views')),
 
 ]
