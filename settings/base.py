@@ -12,7 +12,7 @@ DEBUG = False
 
 NEOMODEL_CYPHER_DEBUG = 1
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'bloom-main.herokuapp.com']
 APPEND_SLASH = False
 # Application definition
 
