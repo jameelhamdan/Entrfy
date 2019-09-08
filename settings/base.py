@@ -1,5 +1,6 @@
 import os
 import neomodel.config as neo4j
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -12,7 +13,7 @@ DEBUG = False
 
 NEOMODEL_CYPHER_DEBUG = 1
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'bloom-main.herokuapp.com']
 APPEND_SLASH = False
 # Application definition
 
@@ -49,8 +50,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'settings.wsgi.application'
 # neomodel_install_labels manage.py auth.models --db bolt://neo4j:1234@localhost:7687
-neo4j.DATABASE_URL = 'bolt://neo4j:1234@localhost:7687'
-
+neo4j.DATABASE_URL = os.environ.get('NEO4J_DATABASE_URL', 'bolt://neo4j:1234@localhost:7687')
+        
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
@@ -84,3 +85,5 @@ LOGGING = {
         },
     },
 }
+
+django_heroku.settings(locals())
