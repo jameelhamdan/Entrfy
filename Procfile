@@ -1,1 +1,1 @@
-web: gunicorn entrfy.wsgi --log-file -
+web: gunicorn Entrfy.wsgi --log-file -
