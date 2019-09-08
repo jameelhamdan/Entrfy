@@ -49,8 +49,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'settings.wsgi.application'
 # neomodel_install_labels manage.py auth.models --db bolt://neo4j:1234@localhost:7687
-neo4j.DATABASE_URL = 'bolt://neo4j:1234@localhost:7687'
+# neo4j.DATABASE_URL = 'bolt://neo4j:1234@localhost:7687'
+neo4j.DATABASE_URL = 'bolt://bloom-main:b.DLpDTybMdRVX.xlJ2btNZeMG0Akh3@hobby-heddbcogogopgbkeminckndl.dbs.graphenedb.com:24787'
 
+        
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
