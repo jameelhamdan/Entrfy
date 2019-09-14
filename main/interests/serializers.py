@@ -34,4 +34,3 @@ class AddUserInterestSerializer(serializers.Serializer):
 class ListInterestSerializer(serializers.Serializer):
     uuid = serializers.CharField()
     name = serializers.CharField()
-

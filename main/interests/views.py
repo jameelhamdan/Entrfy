@@ -4,7 +4,7 @@ from main.interests.serializers import AddInterestSerializer, AddUserInterestSer
 from auth.backend.decorators import view_authenticate
 from extensions.helpers import serializer_to_json
 from extensions.mixins import APIViewMixin
-
+from main.models import Interest
 
 @view_authenticate()
 class AddNewInterestView(APIViewMixin, generics.CreateAPIView):
@@ -34,6 +34,15 @@ class AddInterestView(APIViewMixin, generics.CreateAPIView):
 
 
 @view_authenticate()
+class ListAllInterests(APIViewMixin, generics.ListAPIView):
+    def list(self, request, *args, **kwargs):
+        interests_list = serializer_to_json(ListInterestSerializer, Interest.nodes.all())
+        message = 'Successfully Retrieved All Interests!'
+
+        return self.get_response(message=message, result=interests_list)
+
+
+@view_authenticate()
 class ListUserInterests(APIViewMixin, generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         user = self.request.current_user
@@ -44,10 +53,9 @@ class ListUserInterests(APIViewMixin, generics.ListAPIView):
 
 
 urlpatterns = [
-    # matches
     path('add_new/', AddNewInterestView.as_view(), name='add_new_interest'),
     path('add/', AddInterestView.as_view(), name='add_interest'),
 
-    path('list/all/', ListUserInterests.as_view(), name='list_all_interest'),
+    path('list/all/', ListAllInterests.as_view(), name='list_all_interest'),
     path('list/', ListUserInterests.as_view(), name='list_interest'),
 ]
