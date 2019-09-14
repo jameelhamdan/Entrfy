@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from auth.models import User
+from auth.backend import jwt, utils
 from neomodel import Q
 
 
@@ -58,3 +59,10 @@ class RegisterSerializer(serializers.Serializer):
         )
 
         return user
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    def validate(self, data):
+        old_token = utils.get_auth_header(self.context['request'])
+        new_token = jwt.refresh_auth_token(old_token)
+        return new_token

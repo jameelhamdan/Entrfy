@@ -1,8 +1,6 @@
-from rest_framework import views, generics, status, response
+from rest_framework import generics
 from django.urls import path
-from main.matching.serializers import *
-from auth.middleware import view_allow_any, view_authenticate
-from extensions.helpers import serializer_to_json
+from auth.backend.decorators import view_authenticate
 from extensions.mixins import APIViewMixin
 
 

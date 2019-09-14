@@ -4,17 +4,24 @@ from datetime import datetime, timedelta
 from auth.models import User
 
 SECRET_KEY = settings.SECRET_KEY
+TOKEN_EXPIRATION_PERIOD = settings.TOKEN_EXPIRATION_PERIOD
+
+
+def decode_token(token):
+    token_data = jwt.decode(token, settings.SECRET_KEY, verify=True, algorithms=['HS256'])
+    return token_data
 
 
 def create_auth_token(user_uuid):
-    encoded = jwt.encode({'uuid': user_uuid, 'exp': datetime.utcnow() + timedelta(days=30)}, settings.SECRET_KEY, algorithm='HS256', )
-    return encoded
+    # Create new auth token
+    token = jwt.encode({'uuid': user_uuid, 'exp': datetime.utcnow() + timedelta(days=TOKEN_EXPIRATION_PERIOD)}, settings.SECRET_KEY, algorithm='HS256', )
+    return token
 
 
 def token_is_valid(token):
     try:
         # Decode Token
-        jwt.decode(token, settings.SECRET_KEY, verify=True, algorithms=['HS256'])
+        decode_token(token)
         return token
 
     except jwt.ExpiredSignatureError:
@@ -27,8 +34,8 @@ def token_is_valid(token):
 def verify_auth_token(token):
     try:
         # Decode Token
-        data = jwt.decode(token, settings.SECRET_KEY, verify=True, algorithms=['HS256'])
-        user_uuid = data['uuid']
+        token = decode_token(token)
+        user_uuid = token['uuid']
 
         # Auth User
         try:
@@ -46,3 +53,9 @@ def verify_auth_token(token):
 
     except Exception as e:
         raise Exception(str(e))
+
+
+def refresh_auth_token(token):
+    token = decode_token(token)
+    user_uuid = token['uuid']
+    return create_auth_token(user_uuid)
