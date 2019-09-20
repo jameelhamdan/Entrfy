@@ -30,7 +30,7 @@ def show_messages(chat_uuid, user_uuid, amount=10, skip=0, last_message_uuid=Non
     if user_uuid not in chat.users:
         raise Exception('User is not in this chat')
 
-    return chat.messages.order_by('sent_on')[skip:amount]
+    return chat.messages[skip:amount]
 
 
 def count_messages(chat_uuid, user_uuid):
