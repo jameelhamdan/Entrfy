@@ -1,5 +1,6 @@
 import os
 import neomodel.config as neo4j
+import mongoengine
 import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -54,7 +55,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'settings.wsgi.application'
 # neomodel_install_labels manage.py auth.models --db bolt://neo4j:1234@localhost:7687
 neo4j.DATABASE_URL = os.environ.get('NEO4J_DATABASE_URL', 'bolt://neo4j:1234@localhost:7687')
-        
+
+# mongodb connection
+MONGO_DATABASE_URL = os.environ.get('MONGO_DATABASE_URL', 'mongodb+srv://mongo_user:8Awjk4DZs610i4lN@bloom-cluster-ht33n.mongodb.net/test?retryWrites=true&w=majority')
+mongoengine.connect('mongo_db', host=MONGO_DATABASE_URL, alias='default')
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
