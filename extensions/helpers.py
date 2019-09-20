@@ -7,7 +7,7 @@ import os
 
 
 def generate_uuid():
-    return lambda: uuid.uuid4().hex
+    return uuid.uuid4().hex
 
 
 def hash_password(password):
