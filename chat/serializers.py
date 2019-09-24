@@ -19,8 +19,7 @@ class ChatMessagesSerializer(serializers.Serializer):
     chat_uuid = serializers.CharField(required=True)
 
     def validate(self, data):
-        chat_uuid = data.get('user_uuid', None)
-        content = data.get('content', None)
+        chat_uuid = data.get('chat_uuid', None)
 
         current_user = self.context['request'].current_user
         chat_messages = functions.show_messages(chat_uuid, current_user.uuid)
@@ -36,7 +35,7 @@ class SendChatMessageSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
 
     def validate(self, data):
-        chat_uuid = data.get('user_uuid', None)
+        chat_uuid = data.get('chat_uuid', None)
         content = data.get('content', None)
 
         current_user = self.context['request'].current_user
@@ -46,7 +45,7 @@ class SendChatMessageSerializer(serializers.Serializer):
 
 
 class AddChatSerializer(serializers.Serializer):
-    user_uuid_list = serializers.ListField(child=serializers.CharField(required=True))
+    user_uuid_list = serializers.ListField(child=serializers.CharField(required=True), required=False)
 
     def validate(self, data):
         user_uuid_list = data.get('user_uuid_list', None)

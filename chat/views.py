@@ -1,6 +1,6 @@
 from rest_framework import generics
 from django.urls import path
-from chat.serializers import SendChatMessageSerializer, ChatMessagesSerializer
+from chat.serializers import SendChatMessageSerializer, ChatMessagesSerializer, AddChatSerializer
 from auth.backend.decorators import view_allow_any, view_authenticate
 from extensions.mixins import APIViewMixin
 
@@ -21,7 +21,7 @@ class ListChatMessagesView(APIViewMixin, generics.ListAPIView):
 
 
 @view_authenticate()
-class SendChatMessageView(APIViewMixin, generics.ListAPIView):
+class SendChatMessageView(APIViewMixin, generics.CreateAPIView):
     serializer_class = SendChatMessageSerializer
 
     def create(self, request, *args, **kwargs):
@@ -32,7 +32,20 @@ class SendChatMessageView(APIViewMixin, generics.ListAPIView):
         return self.get_response(message='Successfully Sent Message', result={'chat_uuid': result})
 
 
+@view_authenticate()
+class AddChatView(APIViewMixin, generics.CreateAPIView):
+    serializer_class = AddChatSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
+        result = serializer.validated_data
+
+        return self.get_response(message='Successfully Added Chat', result={'chat_uuid': result})
+
+
 urlpatterns = [
     path('list_chat_messages/', ListChatMessagesView.as_view(), name='list_chat_messages'),
     path('send_chat_message/', SendChatMessageView.as_view(), name='send_chat_message'),
+    path('add_chat/', AddChatView.as_view(), name='add_chat'),
 ]

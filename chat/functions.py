@@ -17,7 +17,11 @@ def add_user_to_chat(chat_uuid, user_uuid):
 
 
 def send_message(chat_uuid, user_uuid, content):
-    chat = ChatNode.objects.get(uuid=chat_uuid)
+    try:
+        chat = ChatNode.objects.get(uuid=chat_uuid)
+    except Exception as e:
+        raise Exception('Chat not found!')
+
     if user_uuid not in chat.users:
         raise Exception('User is not in this chat')
 
@@ -26,7 +30,11 @@ def send_message(chat_uuid, user_uuid, content):
 
 
 def show_messages(chat_uuid, user_uuid, amount=10, skip=0, last_message_uuid=None):
-    chat = ChatNode.objects.get(uuid=chat_uuid)
+    try:
+        chat = ChatNode.objects.get(uuid=chat_uuid)
+    except Exception as e:
+        raise Exception('Chat not found! {}'.format(e))
+
     if user_uuid not in chat.users:
         raise Exception('User is not in this chat')
 
@@ -34,7 +42,11 @@ def show_messages(chat_uuid, user_uuid, amount=10, skip=0, last_message_uuid=Non
 
 
 def count_messages(chat_uuid, user_uuid):
-    chat = ChatNode.objects.get(uuid=chat_uuid)
+    try:
+        chat = ChatNode.objects.get(uuid=chat_uuid)
+    except Exception as e:
+        raise Exception('Chat not found!')
+
     if user_uuid not in chat.users:
         raise Exception('User is not in this chat')
 
