@@ -16,7 +16,7 @@ class FollowUserSerializer(serializers.Serializer):
         user_uuid = data.get('user_uuid', None)
         current_user = self.context['request'].current_user
 
-        user = User.nodes.get_or_none(uuidasd=user_uuid)
+        user = User.nodes.get_or_none(uuid=user_uuid)
         # check if already interested in it
 
         if current_user.follows(user_uuid):
