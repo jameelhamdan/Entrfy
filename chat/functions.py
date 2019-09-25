@@ -1,10 +1,11 @@
-from chat.models import ChatNode, MessageNode
+from rest_framework import serializers
+from chat.models import Chat, mongo
 from auth.models import User
 from neomodel import Q
 
 
 def list_chats(user_uuid):
-    chats = ChatNode.objects.filter(users__contains=user_uuid).order_by('-messages__sent_on')
+    chats = Chat.objects.filter(users__contains=user_uuid).order_by('-messages__sent_on')
     return chats
 
 
@@ -12,31 +13,30 @@ def create_chat(users_uuid):
     # check if uses exist
     new_chat_users = User.nodes.filter(Q(uuid__in=users_uuid))
     if len(new_chat_users) != len(users_uuid):
-        raise Exception('Some Users Doesn\'t Exist!')
+        raise serializers.ValidationError({'user_uuid_list': [u'Some Users Doesn\'t Exist!']})
 
-    chat = ChatNode(users=users_uuid)
+    chat = Chat(users=users_uuid)
     chat.save()
 
     return chat.uuid
 
 
 def add_user_to_chat(chat_uuid, current_user, new_user_uuid):
-    try:
-        chat = ChatNode.objects.get(uuid=chat_uuid)
-    except Exception as e:
-        raise Exception('Chat not found!')
+    chat = Chat.objects.get(uuid=chat_uuid)
+
+    if not chat:
+        raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 
     if current_user not in chat.users:
-        raise Exception('User is not in this chat')
+        raise serializers.ValidationError(u'User is not in this chat')
 
     if new_user_uuid in chat.users:
-        raise Exception('User already in this chat')
+        raise serializers.ValidationError({'user_uuid': [u'User already in this chat']})
 
     # check if users exist
-
-    new_chat_user = User.nodes.get_or_none(uuid=new_user_uuid)
+    new_chat_user = User.nodes.get(uuid=new_user_uuid)
     if not new_chat_user:
-        raise Exception('User Doesn\'t Exist!')
+        raise serializers.ValidationError({'user_uuid': [u'User Doesn\'t Exist!']})
 
     chat.users.append(new_user_uuid)
     chat.save()
@@ -46,12 +46,12 @@ def add_user_to_chat(chat_uuid, current_user, new_user_uuid):
 
 def send_message(chat_uuid, user_uuid, content):
     try:
-        chat = ChatNode.objects.get(uuid=chat_uuid)
-    except Exception as e:
-        raise Exception('Chat not found!')
+        chat = Chat.objects.get(uuid=chat_uuid)
+    except mongo.DoesNotExist:
+        raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 
     if user_uuid not in chat.users:
-        raise Exception('User is not in this chat')
+        raise serializers.ValidationError(u'User is not in this chat')
 
     chat.messages.create(content=content, sent_by=user_uuid)
     chat.save()
@@ -59,23 +59,23 @@ def send_message(chat_uuid, user_uuid, content):
 
 def show_messages(chat_uuid, user_uuid, amount=10, skip=0, last_message_uuid=None):
     try:
-        chat = ChatNode.objects.get(uuid=chat_uuid)
-    except Exception as e:
-        raise Exception('Chat not found! {}'.format(e))
+        chat = Chat.objects.get(uuid=chat_uuid)
+    except mongo.DoesNotExist:
+        raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 
     if user_uuid not in chat.users:
-        raise Exception('User is not in this chat')
+        raise serializers.ValidationError(u'User is not in this chat')
 
     return chat.messages[skip:amount]
 
 
 def count_messages(chat_uuid, user_uuid):
     try:
-        chat = ChatNode.objects.get(uuid=chat_uuid)
-    except Exception as e:
-        raise Exception('Chat not found!')
+        chat = Chat.objects.get(uuid=chat_uuid)
+    except mongo.DoesNotExist:
+        raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 
     if user_uuid not in chat.users:
-        raise Exception('User is not in this chat')
+        raise serializers.ValidationError(u'User is not in this chat')
 
     return chat.messages.count()
