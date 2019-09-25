@@ -1,6 +1,6 @@
 from neomodel import (config, StructuredNode, StringProperty, DateTimeProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, RelationshipFrom, Relationship, ZeroOrMore, ZeroOrOne, db)
 from extensions.models import BaseNode, BaseReltionship
-from auth.models import (User, UserInterestRelationship, UserPostRelationship)
+from auth.models import (User, UserInterestRelationship)
 
 
 class Interest(BaseNode):
@@ -23,8 +23,3 @@ class Interest(BaseNode):
             'name': self.name,
             'users': self.users
         }
-
-
-class Post(BaseNode):
-    content = StringProperty(required=True)
-    posted_by = RelationshipFrom(User, "POSTED", model=UserPostRelationship, cardinality=ZeroOrOne)

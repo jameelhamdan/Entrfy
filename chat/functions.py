@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from chat.models import Chat, mongo
+from chat.models import ChatDocument, mongo
 from auth.models import User
 from neomodel import Q
 
 
 def list_chats(user_uuid):
-    chats = Chat.objects.filter(users__contains=user_uuid).order_by('-messages__sent_on')
+    chats = ChatDocument.objects.filter(users__contains=user_uuid).order_by('-messages__sent_on')
     return chats
 
 
@@ -15,14 +15,14 @@ def create_chat(users_uuid):
     if len(new_chat_users) != len(users_uuid):
         raise serializers.ValidationError({'user_uuid_list': [u'Some Users Doesn\'t Exist!']})
 
-    chat = Chat(users=users_uuid)
+    chat = ChatDocument(users=users_uuid)
     chat.save()
 
     return chat.uuid
 
 
 def add_user_to_chat(chat_uuid, current_user, new_user_uuid):
-    chat = Chat.objects.get(uuid=chat_uuid)
+    chat = ChatDocument.objects.get(uuid=chat_uuid)
 
     if not chat:
         raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
@@ -46,7 +46,7 @@ def add_user_to_chat(chat_uuid, current_user, new_user_uuid):
 
 def send_message(chat_uuid, user_uuid, content):
     try:
-        chat = Chat.objects.get(uuid=chat_uuid)
+        chat = ChatDocument.objects.get(uuid=chat_uuid)
     except mongo.DoesNotExist:
         raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 
@@ -59,7 +59,7 @@ def send_message(chat_uuid, user_uuid, content):
 
 def show_messages(chat_uuid, user_uuid, amount=10, skip=0, last_message_uuid=None):
     try:
-        chat = Chat.objects.get(uuid=chat_uuid)
+        chat = ChatDocument.objects.get(uuid=chat_uuid)
     except mongo.DoesNotExist:
         raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 
@@ -71,7 +71,7 @@ def show_messages(chat_uuid, user_uuid, amount=10, skip=0, last_message_uuid=Non
 
 def count_messages(chat_uuid, user_uuid):
     try:
-        chat = Chat.objects.get(uuid=chat_uuid)
+        chat = ChatDocument.objects.get(uuid=chat_uuid)
     except mongo.DoesNotExist:
         raise serializers.ValidationError({'chat_uuid': [u'Chat not found!']})
 

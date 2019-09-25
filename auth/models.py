@@ -13,10 +13,6 @@ class UserInterestRelationship(BaseReltionship):
     pass
 
 
-class UserPostRelationship(BaseReltionship):
-    pass
-
-
 class UserMixin(object):
     def set_password(self, new_password):
         self.password_hash = hash_password(new_password)

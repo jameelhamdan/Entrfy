@@ -3,7 +3,7 @@ from extensions.helpers import generate_uuid
 import mongoengine as mongo
 
 
-class Message(mongo.EmbeddedDocument):
+class MessageSubDocument(mongo.EmbeddedDocument):
     uuid = mongo.StringField(max_length=36, default=generate_uuid)
 
     content = mongo.StringField(required=True, max_length=500)
@@ -13,11 +13,11 @@ class Message(mongo.EmbeddedDocument):
     created_on = mongo.DateTimeField(default=datetime.utcnow)
 
 
-class Chat(mongo.Document):
+class ChatDocument(mongo.Document):
     uuid = mongo.StringField(max_length=36, default=generate_uuid, unique=True)
 
     users = mongo.ListField(mongo.StringField(max_length=36))
-    messages = mongo.EmbeddedDocumentListField(Message)
+    messages = mongo.EmbeddedDocumentListField(MessageSubDocument)
 
     created_on = mongo.DateTimeField(default=datetime.utcnow)
     meta = {
