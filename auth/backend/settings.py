@@ -5,6 +5,7 @@ from rest_framework.settings import APISettings as _APISettings
 
 USER_SETTINGS = getattr(settings, 'SIMPLE_JWT', None)
 
+# TODO : code to be removed
 DEFAULTS = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),

@@ -1,6 +1,6 @@
 from neomodel import (config, StructuredNode, StringProperty, DateTimeProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, RelationshipFrom, Relationship, ZeroOrMore, ZeroOrOne, db)
 from extensions.models import BaseNode, BaseReltionship
-from extensions.helpers import hash_password, verify_password
+from extensions.helpers import hash_password, verify_password, generate_uuid
 
 DEFAULT_PAGE_SIZE = 10
 
@@ -20,6 +20,10 @@ class UserMixin(object):
 
     def validate_password(self, password):
         return verify_password(self.password_hash, password)
+
+    def reset_secret_key(self):
+        self.secret_key = generate_uuid(3)
+        self.save()
 
     @staticmethod
     def exists(user_name, email):
@@ -42,6 +46,7 @@ class User(BaseNode, UserMixin):
     user_name = StringProperty(unique_index=True)
     email = StringProperty(unique_index=True)
     password_hash = StringProperty()
+    secret_key = StringProperty(default=generate_uuid(3))
     last_login = DateTimeProperty(default_now=True)
 
     followers = Relationship('User', 'FOLLOWING', model=UserFollowerRelationship, cardinality=ZeroOrMore)

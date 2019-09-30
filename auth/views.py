@@ -15,7 +15,7 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
 
-        token = create_auth_token(user.uuid)
+        token = create_auth_token(user.uuid, user.secret_key)
 
         if not token:
             raise Exception('Login Failed')

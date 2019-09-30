@@ -63,6 +63,8 @@ class RegisterSerializer(serializers.Serializer):
 
 class RefreshTokenSerializer(serializers.Serializer):
     def validate(self, data):
+        user = self.context['request'].current_user
+
         old_token = utils.get_auth_header(self.context['request'])
-        new_token = jwt.refresh_auth_token(old_token)
+        new_token = jwt.refresh_auth_token(old_token, user.secret_key)
         return new_token

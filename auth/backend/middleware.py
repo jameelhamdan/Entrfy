@@ -1,5 +1,5 @@
 from rest_framework import status
-from auth.backend.jwt import verify_auth_token, token_is_valid
+from auth.backend.jwt import verify_auth_token
 from extensions.helpers import get_raw_response
 from auth.backend.utils import AuthException, get_auth_header
 
@@ -29,8 +29,7 @@ class AuthMiddleware(object):
 def _http_auth_helper(request):
     try:
         token = get_auth_header(request)
-        validated_token = token_is_valid(token)
-        user = verify_auth_token(validated_token)
+        user = verify_auth_token(token)
 
     except Exception as e:
         raise AuthException(e)
