@@ -1,11 +1,12 @@
-from django.conf import settings
+from auth.backend.settings import api_settings
 from datetime import datetime, timedelta
 from auth.models import User
 import jwt
 
 
-TOKEN_EXPIRATION_PERIOD = settings.TOKEN_EXPIRATION_PERIOD
-MAIN_SECRET_KEY = settings.SECRET_KEY
+TOKEN_EXPIRATION_PERIOD = timedelta(api_settings.TOKEN_LIFETIME)
+MAIN_SECRET_KEY = api_settings.SIGNING_KEY
+user_id_field = api_settings.USER_ID_FIELD
 
 
 def get_secret_key(secret_key):
@@ -23,10 +24,10 @@ def decode_token(token, secret_key='', verify=True):
 
 
 def create_auth_token(user_uuid, secret_key):
-    expire_date = datetime.utcnow() + timedelta(days=TOKEN_EXPIRATION_PERIOD)
+    expire_date = datetime.utcnow() + TOKEN_EXPIRATION_PERIOD
 
     # Create new auth token
-    token = jwt.encode({'uuid': user_uuid, 'exp': expire_date}, get_secret_key(secret_key), algorithm='HS256', )
+    token = jwt.encode({user_id_field: user_uuid, 'exp': expire_date}, get_secret_key(secret_key), algorithm=api_settings.ALGORITHM, )
     return token
 
 
@@ -35,7 +36,7 @@ def verify_auth_token(token):
         # Auth User
         try:
             token_data = jwt.decode(token, verify=False)
-            user_uuid = token_data['uuid']
+            user_uuid = token_data[user_id_field]
             user = User.nodes.get(uuid=user_uuid)
 
             # Validate and Decode Token
@@ -52,5 +53,5 @@ def verify_auth_token(token):
 
 def refresh_auth_token(token, secret_key):
     token = decode_token(token, secret_key)
-    user_uuid = token['uuid']
+    user_uuid = token[user_id_field]
     return create_auth_token(user_uuid, secret_key)
