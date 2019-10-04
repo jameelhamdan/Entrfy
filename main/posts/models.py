@@ -20,8 +20,10 @@ class LikeSubDocument(mongo.EmbeddedDocument):
 
 class PostDocument(mongo.Document):
     uuid = mongo.StringField(max_length=36, default=generate_uuid, unique=True)
-    posted_by = mongo.ListField(mongo.StringField(max_length=36))
 
+    content = mongo.StringField(required=True, max_length=500)
+
+    posted_by = mongo.StringField(max_length=36)
     comments = mongo.EmbeddedDocumentListField(CommentSubDocument)
     likes = mongo.EmbeddedDocumentListField(LikeSubDocument)
 

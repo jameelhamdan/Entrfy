@@ -14,6 +14,6 @@ class ListUserMatchesView(APIViewMixin, generics.ListAPIView):
 
 
 urlpatterns = [
-    path('latest', ListUserMatchesView.as_view(), name='list_matches'),
+    path('latest/', ListUserMatchesView.as_view(), name='list_matches'),
 
 ]

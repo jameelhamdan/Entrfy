@@ -5,5 +5,6 @@ urlpatterns = [
     path('followers/', include('main.followers.views')),
     path('interests/', include('main.interests.views')),
     path('matching/', include('main.matching.views')),
+    path('posts/', include('main.posts.views')),
 
 ]
