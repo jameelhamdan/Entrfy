@@ -2,7 +2,7 @@ from rest_framework import generics
 from django.urls import path
 from chat.serializers import *
 from auth.backend.decorators import view_allow_any, view_authenticate
-from extensions.mixins import APIViewMixin
+from _common.mixins import APIViewMixin
 
 
 @view_authenticate()

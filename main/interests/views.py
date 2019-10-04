@@ -2,9 +2,10 @@ from rest_framework import generics
 from django.urls import path
 from main.interests.serializers import AddInterestSerializer, AddUserInterestSerializer, ListInterestSerializer
 from auth.backend.decorators import view_authenticate
-from extensions.helpers import serializer_to_json
-from extensions.mixins import APIViewMixin
+from _common.helpers import serializer_to_json
+from _common.mixins import APIViewMixin
 from main.models import Interest
+
 
 @view_authenticate()
 class AddNewInterestView(APIViewMixin, generics.CreateAPIView):

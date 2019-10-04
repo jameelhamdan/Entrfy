@@ -1,5 +1,5 @@
 from rest_framework import exceptions, status, views, response
-from extensions.helpers import get_response
+from _common.helpers import get_response
 
 
 class APIViewMixin(views.APIView):

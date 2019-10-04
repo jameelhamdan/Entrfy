@@ -1,10 +1,9 @@
 from auth.backend.settings import api_settings
-from rest_framework import HTTP_HEADER_ENCODING
+from rest_framework import HTTP_HEADER_ENCODING, status
+from rest_framework import exceptions
 
 AUTH_HEADER_TYPES = api_settings.AUTH_HEADER_TYPES
-
-if not isinstance(api_settings.AUTH_HEADER_TYPES, (list, tuple)):
-    AUTH_HEADER_TYPES = (AUTH_HEADER_TYPES,)
+META_TYPE = api_settings.META_TYPE
 
 AUTH_HEADER_TYPE_BYTES = set(
     h.encode(HTTP_HEADER_ENCODING)
@@ -13,13 +12,13 @@ AUTH_HEADER_TYPE_BYTES = set(
 www_authenticate_realm = 'api'
 
 
-class AuthException(Exception):
-    pass
+class AuthException(exceptions.AuthenticationFailed):
+    status_code = status.HTTP_401_UNAUTHORIZED
 
 
 def get_auth_header(request):
     try:
-        header = request.META.get('HTTP_AUTHORIZATION', None)
+        header = request.META.get(META_TYPE, None)
         if not header:
             raise Exception('Token not provided')
 
