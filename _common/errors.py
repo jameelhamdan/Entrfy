@@ -1,5 +1,9 @@
 from rest_framework import status
-from extensions.helpers import get_raw_response
+from _common.helpers import get_raw_response
+
+
+def handler401(request, *args, **argv):
+    return get_raw_response(success=False, message='Authentication Failed', detail_code='authentication_failed', status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 def handler404(request, *args, **argv):

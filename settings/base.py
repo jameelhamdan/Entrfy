@@ -13,7 +13,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'this_is_a_secret_key_please_keep_it_v
 TOKEN_EXPIRATION_PERIOD = 14
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 NEOMODEL_CYPHER_DEBUG = 1
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from chat import functions
-from extensions.helpers import serializer_to_json
+from _common.helpers import serializer_to_json
 from neomodel import Q
 
 

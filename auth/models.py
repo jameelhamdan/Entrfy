@@ -1,6 +1,6 @@
 from neomodel import (config, StructuredNode, StringProperty, DateTimeProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, RelationshipFrom, Relationship, ZeroOrMore, ZeroOrOne, db)
-from extensions.models import BaseNode, BaseReltionship
-from extensions.helpers import hash_password, verify_password, generate_uuid
+from _common.models import BaseNode, BaseReltionship
+from _common.helpers import hash_password, verify_password, generate_uuid
 
 DEFAULT_PAGE_SIZE = 10
 

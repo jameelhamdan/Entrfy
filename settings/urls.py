@@ -1,7 +1,7 @@
 from django.urls import path, include
 
-handler404 = 'extensions.errors.handler404'
-handler500 = 'extensions.errors.handler500'
+handler404 = '_common.errors.handler404'
+handler500 = '_common.errors.handler500'
 
 urlpatterns = [
     path('me/', include('main.urls'), name='main'),

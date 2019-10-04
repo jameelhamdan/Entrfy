@@ -1,7 +1,7 @@
 from rest_framework import generics
 from django.urls import path
 from auth.backend.decorators import view_authenticate
-from extensions.mixins import APIViewMixin
+from _common.mixins import APIViewMixin
 
 
 @view_authenticate()

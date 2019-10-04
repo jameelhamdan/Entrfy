@@ -1,5 +1,5 @@
 from datetime import datetime
-from extensions.helpers import generate_uuid
+from _common.helpers import generate_uuid
 import mongoengine as mongo
 
 
