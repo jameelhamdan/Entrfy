@@ -61,6 +61,29 @@ class RegisterSerializer(serializers.Serializer):
         return user
 
 
+class ResetPasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    new_password_confirm = serializers.CharField(required=True)
+
+    def validate(self, data):
+        # Validate Password
+        user = self.context['request'].current_user
+
+        if not data['new_password'] == data['new_password_confirm']:
+            raise serializers.ValidationError(u'Password Don\'t match!')
+
+        if not user.validate_password(data['old_password']):
+            raise serializers.ValidationError(u'Password Incorrect!')
+
+        if data['new_password'] == data['old_password']:
+            raise serializers.ValidationError(u'New Password must be different than old password')
+
+        user.set_password(data['new_password'])
+
+        return user
+
+
 class RefreshTokenSerializer(serializers.Serializer):
     def validate(self, data):
         user = self.context['request'].current_user

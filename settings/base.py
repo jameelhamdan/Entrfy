@@ -59,7 +59,6 @@ REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
 }
 
-
 # Internationalization
 LANGUAGE_CODE = 'en-ca'
 
@@ -92,4 +91,4 @@ neo4j.DATABASE_URL = NEO4J_DATABASE_URL
 
 # mongodb connection
 MONGO_DATABASE_URL = os.environ.get('MONGO_DATABASE_URL', '')
-mongoengine.connect('mongo_db', host=MONGO_DATABASE_URL, alias='default')
+mongoengine.connect('mongo_db', host=MONGO_DATABASE_URL, alias='default', maxpoolsize=100)

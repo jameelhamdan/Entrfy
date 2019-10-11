@@ -1,5 +1,5 @@
 from rest_framework import generics
-from auth.serializers import LoginSerializer, RegisterSerializer, RefreshTokenSerializer
+from auth.serializers import LoginSerializer, RegisterSerializer, ResetPasswordSerializer, RefreshTokenSerializer
 from auth.backend.jwt import create_auth_token
 from auth.backend.decorators import view_allow_any, view_authenticate
 from _common.mixins import APIViewMixin
@@ -40,6 +40,18 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
             'uuid': user.uuid,
         }
         return self.get_response(message='Successfully Registered User', result=result)
+
+
+@view_authenticate()
+class ResetPasswordView(APIViewMixin, generics.CreateAPIView):
+    serializer_class = ResetPasswordSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+
+        return self.get_response(message='Successfully Updated Password', result=None)
 
 
 @view_authenticate()
