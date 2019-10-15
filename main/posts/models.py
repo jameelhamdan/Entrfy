@@ -28,6 +28,26 @@ class PostDocument(mongo.Document):
     likes = mongo.EmbeddedDocumentListField(LikeSubDocument)
 
     created_on = mongo.DateTimeField(default=datetime.utcnow)
+
+    def comment_on_post(self, user_uuid, content):
+        comment = self.comments.create(content=content, created_by=user_uuid)
+        self.save()
+        return comment
+
+    def like_post(self, user_uuid):
+        # if like exists remove it if it doesn't add it
+        if self.likes.filter(created_by=user_uuid).count():
+
+            self.likes.filter(created_by=user_uuid).delete()
+            like_added = False
+        else:
+
+            self.likes.create(created_by=user_uuid)
+            like_added = True
+
+        self.save()
+        return like_added
+
     meta = {
         'collection': 'post',
     }
