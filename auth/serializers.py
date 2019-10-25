@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from auth.models import User
 from auth.backend import jwt, utils
-from neomodel import Q
+from auth.backend.jwt import create_auth_token, create_refresh_token
 
 
 class LoginSerializer(serializers.Serializer):
@@ -30,7 +30,11 @@ class LoginSerializer(serializers.Serializer):
         if user is None or not user.validate_password(data['password']):
             raise serializers.ValidationError(u'Password or username is incorrect')
 
-        return user
+        user.update_last_login()
+        auth_token = create_auth_token(user.uuid)
+        refresh_token = create_refresh_token(user.uuid, user.secret_key)
+
+        return user, auth_token, refresh_token
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -80,14 +84,29 @@ class ResetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(u'New Password must be different than old password')
 
         user.set_password(data['new_password'])
+        user.reset_secret_key()
+        user.update_last_login()
+        auth_token = create_auth_token(user.uuid)
+        refresh_token = create_refresh_token(user.uuid, user.secret_key)
 
-        return user
+        return user, auth_token, refresh_token
 
 
-class RefreshTokenSerializer(serializers.Serializer):
+class RenewAuthTokenSerializer(serializers.Serializer):
     def validate(self, data):
         user = self.context['request'].current_user
 
         old_token = utils.get_auth_header(self.context['request'])
-        new_token = jwt.refresh_auth_token(old_token, user.secret_key)
+        new_token = jwt.renew_auth_token(old_token, user.secret_key)
         return new_token
+
+
+class RenewRefreshTokenSerializer(serializers.Serializer):
+    def validate(self, data):
+        user = self.context['request'].current_user
+        
+        old_token = utils.get_auth_header(self.context['request'])
+        new_refresh_token = jwt.renew_refresh_token(old_token, user.secret_key)
+        new_auth_token = jwt.renew_auth_token(old_token, user.secret_key)
+
+        return new_refresh_token, new_auth_token

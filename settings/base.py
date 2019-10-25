@@ -7,10 +7,11 @@ import django_heroku
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'this_is_a_secret_key_please_keep_it_very_secret')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'this_is_a_secret_key_please_keep_it_very_secret_and_safe')
 
-# Expiration in days
-TOKEN_EXPIRATION_PERIOD = 14
+# Expiration in minutes
+REFRESH_TOKEN_EXPIRATION_PERIOD = 60 * 24 * 14
+AUTH_TOKEN_EXPIRATION_PERIOD = 60
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False

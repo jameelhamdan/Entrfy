@@ -1,6 +1,7 @@
 from neomodel import (config, StructuredNode, StringProperty, DateTimeProperty, IntegerProperty, UniqueIdProperty, RelationshipTo, RelationshipFrom, Relationship, ZeroOrMore, ZeroOrOne, db)
 from _common.models import BaseNode, BaseReltionship
 from _common.helpers import hash_password, verify_password, generate_uuid
+from datetime import datetime
 
 DEFAULT_PAGE_SIZE = 10
 
@@ -30,6 +31,10 @@ class UserMixin(object):
         query = "MATCH (a:User) WHERE a.user_name= '{}' OR a.email='{}' RETURN count(a) > 0".format(user_name, email)
         results, meta = db.cypher_query(query)
         return results[0][0]
+
+    def update_last_login(self):
+        self.last_login = datetime.utcnow()
+        self.save()
 
     @staticmethod
     def create_user(user_name, email, password):
