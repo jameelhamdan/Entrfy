@@ -36,9 +36,8 @@ class AddPostSerializer(serializers.Serializer):
         post = PostDocument(
             posted_by=user_uuid,
             content=content,
-        )
+        ).save()
 
-        post.save()
         return post.uuid
 
 
@@ -57,8 +56,7 @@ class AddPostCommentSerializer(serializers.Serializer):
         except mongo.DoesNotExist:
             raise serializers.ValidationError({'post_uuid': [u'Post not found!']})
 
-        comment = post.comments.create(content=content, created_by=user_uuid)
-        post.save()
+        comment = post.comment_on_post(user_uuid, content)
 
         return post.uuid, comment.uuid
 
@@ -77,15 +75,4 @@ class AddPostLikeSerializer(serializers.Serializer):
         except mongo.DoesNotExist:
             raise serializers.ValidationError({'post_uuid': [u'Post not found!']})
 
-        # if like exists remove it if it doesn't add it
-        if post.likes.filter(created_by=user_uuid).count():
-
-            post.likes.filter(created_by=user_uuid).delete()
-            like_added = False
-        else:
-
-            post.likes.create(created_by=user_uuid)
-            like_added = True
-
-        post.save()
-        return post.uuid, like_added
+        return post.uuid, post.like_post(user_uuid)
