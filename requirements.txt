@@ -1,5 +1,5 @@
 Django==2.2.13
-djangorestframework==3.10.2
+djangorestframework==3.11.2
 neo4j-driver==1.6.3
 neomodel==3.3.1
 neotime==1.7.4
